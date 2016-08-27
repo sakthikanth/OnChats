@@ -9,6 +9,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="This is Fragment B" />
+        android:text="This is Fragmen B" />
 
 </RelativeLayout>
