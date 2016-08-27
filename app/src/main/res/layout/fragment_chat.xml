@@ -14,7 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/msg_enter_container"
-        android:scrollY="@dimen/activity_vertical_margin">
+        android:scrollY="@dimen/activity_vertical_margin"
+        android:fillViewport="true">
     <LinearLayout
         android:id="@+id/full_container"
         android:orientation="vertical"
@@ -183,7 +184,8 @@ AutoCompleteTextView widget, discussed in greater detail in Chapter 12."
                 android:layout_gravity="bottom"
                 android:padding="10dp"
                 android:background="@android:color/background_light"
-                android:foregroundGravity="top|center" />
+                android:foregroundGravity="top|center"
+                android:maxHeight="75dp" />
         </LinearLayout>
 
         <LinearLayout

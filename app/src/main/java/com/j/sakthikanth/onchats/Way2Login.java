@@ -78,18 +78,22 @@ public class Way2Login extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try{
+
+                    mob_no=mob_inp.getText().toString();
+                    pass_word=pass_inp.getText().toString();
+
                     SQLiteDatabase db = openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
-                   // db.execSQL("create table way2_dets(mob_no text,phone text,pass_word text)");
+                    db.execSQL("drop table way2_dets");
+
+                    db.execSQL("create table way2_dets(mob_no text,phone text,pass_word text)");
 
                     ContentValues contentValues = new ContentValues();
                     contentValues.put("mob_no", mob_no);
                     contentValues.put("pass_word", pass_word);
 
 
-                     //db.insert("way2_dets", null, contentValues);
-                    Intent ints=new Intent(getApplicationContext(),MainPage.class);
-                    startActivity(ints);
-                   //new LongOperation().execute();
+                     db.insert("way2_dets", null, contentValues);
+
                     Log.v("db_sts","crtd");
                 }catch (Exception e){
                     Log.v("db_sts",e.getMessage());
