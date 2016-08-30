@@ -2,6 +2,7 @@ package com.j.sakthikanth.onchats;
 
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -68,6 +69,7 @@ public class MainPage2 extends AppCompatActivity {
             return true;
         }
 
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -80,6 +82,7 @@ public class MainPage2 extends AppCompatActivity {
 
         }
 
+
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
@@ -89,7 +92,7 @@ public class MainPage2 extends AppCompatActivity {
             if(position == 0) {
                 fragment = new Message_fragments();
             } else if (position == 1) {
-                fragment = new Contact_fragment();
+                fragment = new ItemFragment();
             }
             return fragment;
 

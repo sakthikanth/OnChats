@@ -1,32 +1,15 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-
-    android:background="@android:color/transparent"
-    android:elevation="0dp">
 
 
     <LinearLayout
+
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="horizontal"
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="2dp"
-
-        android:focusableInTouchMode="true"
-        android:clickable="true"
-
-        android:divider="@android:color/background_dark"
-        android:fadingEdge="horizontal|vertical"
-        android:filterTouchesWhenObscured="true"
-        android:focusable="true"
-        android:forceHasOverlappingRendering="true"
-        android:layout_marginTop="2dp"
-        android:longClickable="true"
-        android:isScrollContainer="true">
+    >
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -39,7 +22,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="end|left"
                 android:layout_marginLeft="5dp"
-                app:backgroundTint="@android:color/holo_red_dark"
+                app:backgroundTint="@android:color/darker_gray"
                 app:elevation="0dp"
                 android:layout_marginTop="10dp" />
 
@@ -103,11 +86,5 @@
     </LinearLayout>
 
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:padding="4dp"
-        android:background="?attr/colorControlHighlight" />
 
-</LinearLayout>
 

@@ -44,6 +44,16 @@ public class Registration extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SQLiteDatabase db = openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
+
+        Cursor cr=db.rawQuery("select user_name from contacts",null);
+        if(cr.getCount()>0){
+
+            Intent inm=new Intent(this,Way2Login.class);
+            startActivity(inm);
+
+        }
         setContentView(R.layout.activity_registration);
         // Set up the login form.
         name_inp=(AutoCompleteTextView)findViewById(R.id.user_name);
@@ -54,12 +64,13 @@ public class Registration extends AppCompatActivity {
         email_id=email_inp.getText().toString();
         pass_word=pass_inp.getText().toString();
 
+
+
         reg_btn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 try{
                     SQLiteDatabase db = openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
-                    //db.execSQL("create table users(user_id integer primary key, user_name text,phone text,email_id text, pass_word text)");
 
                     ContentValues contentValues = new ContentValues();
                     contentValues.put("user_name", pers_name);
@@ -67,7 +78,7 @@ public class Registration extends AppCompatActivity {
                     contentValues.put("pass_word", pass_word);
 
 
-                   // db.insert("contacts", null, contentValues);
+                    db.insert("contacts", null, contentValues);
 
                     Intent ints =new Intent(getApplicationContext(),Way2Login.class);
                     startActivity(ints);

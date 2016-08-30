@@ -37,6 +37,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Random;
+
 public class Way2Login extends AppCompatActivity {
 
 
@@ -49,6 +56,16 @@ public class Way2Login extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SQLiteDatabase db = openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
+
+        Cursor cr=db.rawQuery("select mob_no,pass_word from way2_dets",null);
+        if(cr.getCount()>0){
+
+            Intent inm=new Intent(this,MainPage2.class);
+           // startActivity(inm);
+
+        }
         setContentView(R.layout.activity_way2_login);
         // Set up the login form.
         mob_inp=(AutoCompleteTextView)findViewById(R.id.way2mob_no);
@@ -77,15 +94,14 @@ public class Way2Login extends AppCompatActivity {
         reg_btn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                try{
+
+                   try{
 
                     mob_no=mob_inp.getText().toString();
                     pass_word=pass_inp.getText().toString();
 
-                    SQLiteDatabase db = openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
-                    db.execSQL("drop table way2_dets");
 
-                    db.execSQL("create table way2_dets(mob_no text,phone text,pass_word text)");
+                    SQLiteDatabase db = openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
 
                     ContentValues contentValues = new ContentValues();
                     contentValues.put("mob_no", mob_no);
@@ -93,6 +109,9 @@ public class Way2Login extends AppCompatActivity {
 
 
                      db.insert("way2_dets", null, contentValues);
+
+                    Intent innn=new Intent(getApplicationContext(),MainPage2.class);
+                    startActivity(innn);
 
                     Log.v("db_sts","crtd");
                 }catch (Exception e){
@@ -108,14 +127,14 @@ public class Way2Login extends AppCompatActivity {
 
 
 
-    /*public class LongOperation  extends AsyncTask<String, Void, Void> {
+    public class LongOperation  extends AsyncTask<String, Void, Void> {
 
         // Required initialization
 
         // private final HttpClient Client = new DefaultHttpClient();
-        private String Content;
+        public String Content="";
         private String Error = null;
-        private ProgressDialog Dialog = new ProgressDialog(Registration.this);
+        private ProgressDialog Dialog = new ProgressDialog(Way2Login.this);
         String data ="";
         String otpt="";
 
@@ -123,11 +142,9 @@ public class Way2Login extends AppCompatActivity {
 
         protected void onPreExecute() {
             // NOTE: You can call UI Element here.
-
-            //Start Progress Dialog (Message)
-
-            Dialog.setMessage("Please wait..");
+            Dialog.setMessage("Sending...");
             Dialog.show();
+
 
 
 
@@ -135,33 +152,83 @@ public class Way2Login extends AppCompatActivity {
 
         // Call after onPreExecute method
         protected Void doInBackground(String... urls) {
+            BufferedReader reader=null;
+
+            // Send data
+            try
+            {
+                Log.i("my_err","goto");
+                // Defined URL  where to send data
+                URL url = new URL(urls[0]);
+
+                // Send POST data request
+
+                URLConnection conn = url.openConnection();
+                conn.setDoOutput(true);
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write( "" );
+                wr.flush();
+
+                Log.i("my_err", "ouput");
+                // Get the server response
+                try{
+                    reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    // StringBuilder sb = new StringBuilder();
+                    String line = null;
 
 
-                Log.i("Send email", "");
-                String[] TO = {""};
-                String[] CC = {""};
-            try{
-                Intent intent = new Intent(Intent.ACTION_SENDTO); // it's not ACTION_SEND
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Subject of email");
-                intent.putExtra(Intent.EXTRA_TEXT, "Body of email");
-                intent.setData(Uri.parse("mailto:sakthikanthj@gmail.com")); // or just "mailto:" for blank
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // this will make such that when user returns to your app, your app is displayed, instead of the email app.
-                startActivity(intent);
-                Log.v("email_sts","email sent");
-            }catch (Exception e){
-                Log.v("email_sts",e.getMessage());
+                    // Read Server Response
+                    while((line = reader.readLine()) != null)
+                    {
+                        // Append server response in string
+                        // sb.append(line + "\n");
+                        otpt+=line;
+
+                    }
+
+                    // Append Server Response To Content String
+                    Content = otpt;
+                    Log.i("my_err","output="+otpt);
+                }catch (Exception e){
+                    Log.i("my_err","error="+e.getMessage());
+                }
+
+
 
             }
+            catch(Exception ex)
+            {
+                Error = ex.getMessage();
+            }
+            finally
+            {
+                try
+                {
 
+                    reader.close();
+                }
+
+                catch(Exception ex) {}
+            }
+
+            /*****************************************************/
             return null;
         }
 
 
-        protected void onPostExecute(Void unused) {}
+        protected void onPostExecute(Void unused) {
+
+
+            Dialog.dismiss();
+
+            if(Content.hashCode()>0){
+                Toast.makeText(getApplicationContext(),"Sent",Toast.LENGTH_LONG).show();
+
+            }
+        }
 
     }
-*/
+
 
 }
 

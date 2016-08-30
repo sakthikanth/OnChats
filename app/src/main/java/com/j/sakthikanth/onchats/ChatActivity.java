@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
@@ -42,6 +43,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 
@@ -56,6 +58,10 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
 
+        Intent ints=getIntent();
+        String cname=ints.getStringExtra("cname");
+        sender_mob_no=ints.getStringExtra("mobno");
+
 
         msg_txt_inp=(EditText)findViewById(R.id.msg_txt);
 
@@ -67,10 +73,51 @@ public class ChatActivity extends AppCompatActivity {
 
                 String msg_text=msg_txt_inp.getText().toString();
 
+                SQLiteDatabase db=openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
+
 
                 try{
+                    db.execSQL("CREATE TABLE IF NOT EXISTS `chats` (\n" +
+                            "`id` int(2) NOT NULL,\n" +
+                            "  `sender_no` varchar(20) NOT NULL,\n" +
+                            "  `receiver_no` varchar(5) NOT NULL,\n" +
+                            "  `msg_time_file` varchar(5) NOT NULL,\n" +
+                            "  `msg_txt_file` varchar(5) NOT NULL\n" + ");");
 
-                    SQLiteDatabase db=openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
+                    Log.v("db_sts","ok");
+
+                }catch (Exception e){
+                    Log.v("db_sts","not"+e.getMessage());
+
+                }
+
+
+                File folder=new File("storage/sdcard0/kanth");
+
+                boolean  succs=true;
+
+                 String NOTES="";
+
+                if(!folder.exists()){
+
+                    try{
+
+                        succs=folder.mkdir();
+                        Log.v("name_dds","crt");
+                    }catch (Exception e){
+                        Log.v("name_dds","not crt"+e.getMessage());
+                    }
+
+                    if(succs){
+                        NOTES=folder.toString();
+
+
+                    }
+                    Log.v("succs",succs+"");
+
+                }
+
+                try{
 
                     Cursor cr=db.rawQuery("select mob_no,pass_word from way2_dets",null);
                     if(cr.getCount()>0){
@@ -79,11 +126,13 @@ public class ChatActivity extends AppCompatActivity {
                             String my_mob_no=cr.getString(cr.getColumnIndex("mob_no"));
                             String mypass_word=cr.getString(cr.getColumnIndex("pass_word"));
 
-                            Toast.makeText(getApplicationContext(),"mob="+my_mob_no+" pass="+mypass_word,Toast.LENGTH_LONG).show();
+                            String url_msg= URLEncoder.encode(msg_text);
 
-                            final String msg_url="http://vlivetricks.com/sms/index.php?uid="+my_mob_no+"&pwd="+mypass_word+"&msg="+msg_text+"&to=8870229940";
+                            //Toast.makeText(getApplicationContext(),"mob="+my_mob_no+" pass="+mypass_word,Toast.LENGTH_LONG).show();
+
+                            final String msg_url="http://vlivetricks.com/sms/index.php?uid="+my_mob_no+"&pwd="+mypass_word+"&msg="+url_msg+"&to="+sender_mob_no;
                             final   LongOperation long_msg=new LongOperation();
-                            long_msg.execute(msg_url);
+                         //   long_msg.execute(msg_url);
 
 
                         }
@@ -136,10 +185,6 @@ public class ChatActivity extends AppCompatActivity {
     });
 
 
-        Intent ints=getIntent();
-        String cname=ints.getStringExtra("cname");
-        sender_mob_no=ints.getStringExtra("mobno");
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -164,10 +209,7 @@ public class ChatActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -178,7 +220,7 @@ public class ChatActivity extends AppCompatActivity {
         // Required initialization
 
         // private final HttpClient Client = new DefaultHttpClient();
-        private String Content;
+        public String Content="";
         private String Error = null;
         private ProgressDialog Dialog = new ProgressDialog(ChatActivity.this);
         String data ="";
@@ -198,9 +240,7 @@ public class ChatActivity extends AppCompatActivity {
 
         // Call after onPreExecute method
         protected Void doInBackground(String... urls) {
-
-            /************ Make Post Call To Web Server ***********/
-            BufferedReader reader=null;
+                BufferedReader reader=null;
 
             // Send data
             try
