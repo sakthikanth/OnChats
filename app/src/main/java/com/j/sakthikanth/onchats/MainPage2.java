@@ -92,7 +92,7 @@ public class MainPage2 extends AppCompatActivity {
             if(position == 0) {
                 fragment = new Message_fragments();
             } else if (position == 1) {
-                fragment = new ItemFragment();
+                fragment = new Contact_fragment();
             }
             return fragment;
 

@@ -27,6 +27,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -43,6 +44,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,25 +52,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AlphabetIndexer;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
+import java.util.StringTokenizer;
 
 public class ContactsListFragment extends ListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnQueryTextListener, SearchView.OnCloseListener  {
 
 	private OnContactSelectedListener mContactsListener;
 	private SimpleCursorAdapter mAdapter;
+	public ArrayAdapter<String> arr_adapter;
 	private String mSearchString = null;
 	private SearchView mSearchView;
+	public String all_mobs="";
+	public MatrixCursor mMatrixCursor;
 
+   public ListView listv;
 	@SuppressLint("InlinedApi")
 	private static String DISPLAY_NAME_COMPAT = Build.VERSION.SDK_INT
 			>= Build.VERSION_CODES.HONEYCOMB ?
 			Contacts.DISPLAY_NAME_PRIMARY :
 			Contacts.DISPLAY_NAME;
+
 
 
 	private static final String[] CONTACTS_SUMMARY_PROJECTION = new String[] {
@@ -80,6 +89,9 @@ public class ContactsListFragment extends ListFragment implements
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+		View view=inflater.inflate(R.layout.fragment_contacts_list, container, false);
+		listv=(ListView)view.findViewById(R.id.list);
 		return inflater.inflate(R.layout.fragment_contacts_list, container, false);
 	}
 	
@@ -88,16 +100,20 @@ public class ContactsListFragment extends ListFragment implements
 		super.onActivityCreated(savedInstanceState);
 
 		setHasOptionsMenu(true);
-		
+		mMatrixCursor = new MatrixCursor(new String[] { "_id","name","phone","contact_ids"} );
+
+
 		getLoaderManager().initLoader(0, null, this);
-		
+
 		mAdapter = new IndexedListAdapter(
 				this.getActivity(),
 				R.layout.list_item_contacts,
 				null,
-				new String[] {Contacts.DISPLAY_NAME},
+				new String[] {"name"},
 				new int[] {R.id.display_name});
-		
+
+
+
 		setListAdapter(mAdapter);
 		getListView().setFastScrollEnabled(true);
 
@@ -155,7 +171,7 @@ public class ContactsListFragment extends ListFragment implements
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 		Uri baseUri;
-		
+
 		if (mSearchString != null) {
             baseUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI,
                     Uri.encode(mSearchString));
@@ -164,23 +180,65 @@ public class ContactsListFragment extends ListFragment implements
         }
 
 		String selection = "((" + DISPLAY_NAME_COMPAT + " NOTNULL) AND ("
-				+ Contacts.HAS_PHONE_NUMBER + "=1) AND ("
+				+ Contacts.HAS_PHONE_NUMBER + ") AND ("
 				+ DISPLAY_NAME_COMPAT + " != '' ))";
 
 		String sortOrder = Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
 
-		return new CursorLoader(getActivity(), baseUri, CONTACTS_SUMMARY_PROJECTION, selection, null, sortOrder);
+		CursorLoader crl= new CursorLoader(getActivity(), baseUri, CONTACTS_SUMMARY_PROJECTION, selection, null, sortOrder);
+
+
+
+		return crl;
 	}
-	
+
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		mAdapter.swapCursor(data);
+		String[] projection = new String[] {Phone.DISPLAY_NAME, Phone.TYPE, Phone.NUMBER, Phone.LABEL};
+
+
+		String all_nm="";
+		if(data.moveToFirst()){
+			while (data.moveToNext()){
+
+
+				long contactId=data.getLong(data.getColumnIndex(Contacts._ID));
+
+				String cname=data.getString(data.getColumnIndexOrThrow(Contacts.DISPLAY_NAME));
+				final Cursor phoneCursor = getActivity().getContentResolver().query(
+						Phone.CONTENT_URI, projection, Data.CONTACT_ID + "=?", new String[]{String.valueOf(contactId)}, null);
+
+if(phoneCursor.moveToFirst()){
+
+	String t_mob=phoneCursor.getString(phoneCursor.getColumnIndex(Phone.NUMBER)).replace(" ","");
+	if(!all_nm.contains(t_mob)){
+
+		all_nm+=t_mob+",";
+		final String PhoneNumber =phoneCursor.getString(phoneCursor.getColumnIndex(Phone.NUMBER))+"";
+
+
+		mMatrixCursor.addRow(new Object[]{ Long.toString(contactId),cname,PhoneNumber,contactId});
+
+	}
+
+
+}
+
+
+			}
+		}
+		mAdapter.swapCursor(mMatrixCursor);
+
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
+
 		mAdapter.swapCursor(null);
 	}
+
+
+
 
 	@Override
 	public boolean onClose() {
@@ -224,19 +282,23 @@ public class ContactsListFragment extends ListFragment implements
 		
 		public IndexedListAdapter(Context context, int layout, Cursor c,
 				String[] from, int[] to) {
-			super(context, layout, c, from, to, 0);		
+			super(context, layout, c, from, to, 0);
 		}
 
 		@Override
 		public Cursor swapCursor(Cursor c) {
+
+
 			if (c != null) {
-				alphaIndexer = new AlphabetIndexer(c,
-						c.getColumnIndex(Contacts.DISPLAY_NAME),
+				alphaIndexer = new AlphabetIndexer(mMatrixCursor,
+						mMatrixCursor.getColumnIndex("name"),
 						" ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
 			}
 
 			return super.swapCursor(c);
 		}
+
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
@@ -262,7 +324,7 @@ public class ContactsListFragment extends ListFragment implements
 		public void bindView(View view, Context context, Cursor cursor) {
 			super.bindView(view, context, cursor);
 
-			long contactId = cursor.getLong(cursor.getColumnIndexOrThrow(Contacts._ID));
+			long contactId = mMatrixCursor.getColumnIndex("contact_ids");
 			ViewHolder viewHolder = (ViewHolder) view.getTag();
 			viewHolder.phoneNumberLookupTask = new PhoneNumberLookupTask(view);
 			viewHolder.phoneNumberLookupTask.execute(contactId);
@@ -270,16 +332,19 @@ public class ContactsListFragment extends ListFragment implements
 
 		@Override
 		public int getPositionForSection(int section) {
+			Log.v("sec_sec",section+"");
 			return alphaIndexer.getPositionForSection(section);
 		}
 
 		@Override
 		public int getSectionForPosition(int position) {
+			Log.v("sec_pos",position+"");
 			return alphaIndexer.getSectionForPosition(position);
 		}
 
 		@Override
 		public Object[] getSections() {
+
 			return alphaIndexer == null ? null : alphaIndexer.getSections();
 		}
 	}
@@ -305,15 +370,15 @@ public class ContactsListFragment extends ListFragment implements
 			long contactId = ids[0];
 
 			final Cursor phoneCursor = getActivity().getContentResolver().query(
-					Phone.CONTENT_URI,
-					projection,
-					Data.CONTACT_ID + "=?",
-					new String[]{String.valueOf(contactId)},
-					null);
+					Phone.CONTENT_URI, projection, Data.CONTACT_ID + "=?", new String[]{String.valueOf(contactId)}, null);
 
 			if(phoneCursor != null && phoneCursor.moveToFirst() && phoneCursor.getCount() == 1) {
 				final int contactNumberColumnIndex 	= phoneCursor.getColumnIndex(Phone.NUMBER);
+
+
 				mPhoneNumber = phoneCursor.getString(contactNumberColumnIndex);
+				Log.v("mob_no",mPhoneNumber);
+
 				int type = phoneCursor.getInt(phoneCursor.getColumnIndexOrThrow(Phone.TYPE));
 				mPhoneLabel = phoneCursor.getString(phoneCursor.getColumnIndex(Phone.LABEL));
 				mPhoneLabel = Phone.getTypeLabel(getResources(), type, mPhoneLabel).toString();

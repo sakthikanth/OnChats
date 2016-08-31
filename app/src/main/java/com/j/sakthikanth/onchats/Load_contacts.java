@@ -14,6 +14,8 @@ package com.j.sakthikanth.onchats;
         import android.provider.ContactsContract;
         import android.support.v4.widget.SimpleCursorAdapter;
         import android.view.Menu;
+        import android.view.View;
+        import android.widget.AdapterView;
         import android.widget.ListView;
 
 public class Load_contacts extends Activity {
@@ -40,6 +42,12 @@ public class Load_contacts extends Activity {
         
         // Setting the adapter to listview
         lstContacts.setAdapter(mAdapter);
+                lstContacts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                    }
+                });
         
         // Creating an AsyncTask object to retrieve and load listview with contacts
         ListViewContactsLoader listViewContactsLoader = new ListViewContactsLoader();
@@ -176,6 +184,7 @@ public class Load_contacts extends Activity {
                 @Override
         protected void onPostExecute(Cursor result) {
             // Setting the cursor containing contacts to listview
+
             mAdapter.swapCursor(result);
             }
         }
