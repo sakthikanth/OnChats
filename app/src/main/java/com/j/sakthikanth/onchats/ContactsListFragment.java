@@ -78,8 +78,6 @@ public class ContactsListFragment extends ListFragment implements
 			Contacts.DISPLAY_NAME_PRIMARY :
 			Contacts.DISPLAY_NAME;
 
-
-
 	private static final String[] CONTACTS_SUMMARY_PROJECTION = new String[] {
 			Contacts._ID,
 			DISPLAY_NAME_COMPAT,
@@ -173,8 +171,7 @@ public class ContactsListFragment extends ListFragment implements
 		Uri baseUri;
 
 		if (mSearchString != null) {
-            baseUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI,
-                    Uri.encode(mSearchString));
+            baseUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI, Uri.encode(mSearchString));
         } else {
             baseUri = Contacts.CONTENT_URI;
         }
@@ -236,8 +233,6 @@ if(phoneCursor.moveToFirst()){
 
 		mAdapter.swapCursor(null);
 	}
-
-
 
 
 	@Override

@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
                         try{
 
-                            cr=db.rawQuery("select c_id from cont_lists where mob_nos='"+mobilePhone+"'",null);
+                            cr=db.rawQuery("select _id from cont_lists where mob_nos='"+mobilePhone+"'",null);
 
                             if(cr.getCount()==0){
                                 if(!all_nm.contains(mobilePhone)){
@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
         protected void onPostExecute(Void unused) {
 
-            cr=db.rawQuery("select c_id from cont_lists ",null);
+            cr=db.rawQuery("select _id from cont_lists ",null);
 
             Toast.makeText(getApplicationContext(),"Ins "+cr.getCount(),Toast.LENGTH_LONG).show();
 
@@ -252,12 +252,13 @@ public class MainActivity extends AppCompatActivity {
 
             Log.v("db_funs","crst");
             try{
+
                 String crt_cnct= "CREATE TABLE IF NOT EXISTS contacts  ( user_id   INTEGER PRIMARY KEY AUTOINCREMENT, user_name TEXT, phone TEXT, email_id TEXT, pass_word TEXT  )";
                 db.execSQL(crt_cnct);
                 String way2_dets= "CREATE TABLE IF NOT EXISTS way2_dets  (  mob_no TEXT, pass_word TEXT )";
                 db.execSQL(way2_dets);
 
-                String cont_lists= "CREATE TABLE IF NOT EXISTS cont_lists  ( c_id   INTEGER PRIMARY KEY AUTOINCREMENT, cname TEXT,  mob_nos TEXT, photo TEXT  )";
+                String cont_lists= "CREATE TABLE IF NOT EXISTS cont_lists  ( _id   INTEGER PRIMARY KEY AUTOINCREMENT, cname TEXT,  mob_nos TEXT, photo TEXT  )";
                 db.execSQL(cont_lists);
 
                 Log.v("db_funs","fin crt");
