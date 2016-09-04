@@ -47,13 +47,7 @@ public class Registration extends AppCompatActivity {
 
         SQLiteDatabase db = openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
 
-        Cursor cr=db.rawQuery("select user_name from contacts",null);
-        if(cr.getCount()>0){
 
-            Intent inm=new Intent(this,Way2Login.class);
-            startActivity(inm);
-
-        }
         setContentView(R.layout.activity_registration);
         // Set up the login form.
         name_inp=(AutoCompleteTextView)findViewById(R.id.user_name);
@@ -78,7 +72,7 @@ public class Registration extends AppCompatActivity {
                     contentValues.put("pass_word", pass_word);
 
 
-                    db.insert("contacts", null, contentValues);
+                    db.insert("users", null, contentValues);
 
                     Intent ints =new Intent(getApplicationContext(),Way2Login.class);
                     startActivity(ints);

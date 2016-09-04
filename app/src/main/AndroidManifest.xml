@@ -21,19 +21,19 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".Registration"
-            android:label="@string/app_name" >
-
-        </activity>
-
-
+            android:label="@string/app_name" />
         <activity
             android:name=".Way2Login"
             android:label="@string/title_activity_way2_login" />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".MainPage"
@@ -42,13 +42,7 @@
         <activity
             android:name=".MainPage2"
             android:label="@string/title_activity_main_page2"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ChatActivity"
             android:label="@string/title_activity_chat"
@@ -58,22 +52,19 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.j.sakthikanth.onchats.MainPage2" />
-
         </activity>
-        <activity android:name=".Base64_enc"></activity>
-        <activity android:name=".Load_contacts">
+        <activity android:name=".Base64_enc" />
+        <activity android:name=".Load_contacts" />
+        <activity android:name=".ContactsPickerActivity" />
 
-        </activity>
-
-        <activity android:name=".ContactsPickerActivity" >
-
-        </activity>
-
-        <receiver android:name="com.j.sakthikanth.onchats.IncomingSms">
+        <receiver android:name=".IncomingSms">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".Main2Activity" />
+        <activity android:name=".Otp_verfication"></activity>
     </application>
 
 </manifest>

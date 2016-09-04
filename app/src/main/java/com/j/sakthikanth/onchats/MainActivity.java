@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         private boolean  succs;
         private Cursor cr;
+        public String all_nm="";
         private ContentValues cvs=new ContentValues();
         protected void onPreExecute() {
 
@@ -69,9 +70,10 @@ public class MainActivity extends AppCompatActivity {
 
             // Querying the table ContactsContract.Contacts to retrieve all the contacts
             Cursor contactsCursor = getContentResolver().query(contactsUri, null, null, null,
-                    ContactsContract.Contacts.SORT_KEY_PRIMARY+ " ASC ");
+                    ContactsContract.Contacts.CONTACT_LAST_UPDATED_TIMESTAMP+ " ASC ");
 
-            if(contactsCursor.moveToFirst()){
+
+            if(contactsCursor.moveToLast()){
 
                 do{
                     long contactId = contactsCursor.getLong(contactsCursor.getColumnIndex("_ID"));
@@ -92,16 +94,14 @@ public class MainActivity extends AppCompatActivity {
                     String photoPath="";
                     byte[] photoByte=null;
 
-                    String all_nm="";
 
-                    if(dataCursor.moveToFirst()){
+
+                    if(dataCursor.moveToFirst() && dataCursor.getCount()>0){
                         // Getting Display Name
                         displayName = dataCursor.getString(dataCursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME ));
                         do{
 
-
-
-                            // Getting NickName
+                               // Getting NickNam
                             if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE))
                                 nickName = dataCursor.getString(dataCursor.getColumnIndex("data1"));
 
@@ -163,29 +163,76 @@ public class MainActivity extends AppCompatActivity {
                         Log.v("last_nm",displayName);
 
                         mobilePhone=mobilePhone.replace(" ","");
-
+                          long c_id=contactId;
                         try{
 
-                            cr=db.rawQuery("select _id from cont_lists where mob_nos='"+mobilePhone+"'",null);
+                            boolean updted=false;
+                            boolean avlbl=false;
+                            Cursor cr1=db.rawQuery("select _id from cont_lists where orig_c_id='"+c_id+"'",null);
+                            if(cr1.getCount()>0){
 
-                            if(cr.getCount()==0){
-                                if(!all_nm.contains(mobilePhone)){
-                                    if(mobilePhone != null && !mobilePhone.equals("") ){
+                            cr1=db.rawQuery("select _id from cont_lists where cname='"+displayName+"' and orig_c_id='"+c_id+"'",null);
+
+                                if(cr1.getCount()==0){
+                                    updted=true;
+                                }
+
+                                cr1=db.rawQuery("select _id from cont_lists where mob_nos='"+mobilePhone+"' and orig_c_id='"+c_id+"'",null);
+                                if(cr1.getCount()==0){
+                                    updted=true;
+                                }
+                                cr1=db.rawQuery("select _id from cont_lists where photo='"+photoPath+"' and orig_c_id='"+c_id+"'",null);
+                                if(cr1.getCount()==0){
+                                    updted=true;
+                                }
+
+
+                                avlbl=true;
+
+
+                            }
+
+                            if(avlbl==true && updted==false){
+                               Log.v("last_nm","brk");
+                                break;
+                            }
+
+
+
+                                if(!all_nm.contains(mobilePhone) && mobilePhone != null && !mobilePhone.equals("")){
+
                                         Log.v("c_id",mobilePhone+"s");
                                         cvs.put("mob_nos",mobilePhone);
                                         cvs.put("cname",displayName);
                                         cvs.put("photo",photoPath);
+                                        cvs.put("orig_c_id",c_id);
 
-                                        db.insert("cont_lists",null,cvs);
+                                        if(updted){
+                                           db.update("cont_lists",cvs,"orig_c_id='"+c_id+"'",null);
+
+                                        }else {
+                                            if(avlbl==false){
+
+                                                db.insert("cont_lists",null,cvs);
+
+                                            }else{
+
+                                            }
+
+                                        }
 
                                         all_nm+=mobilePhone+",";
-                                    }
+
+
+
+                                  //  Log.v("last_nm","avl");
+
+                                }else{
+                                 //   Log.v("last_nm","crta");
 
                                 }
 
-                            }else{
-                                continue;
-                            }
+
 
                         }catch (Exception e){
                             Log.v("db_err",e.getMessage());
@@ -198,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
 
                         // Adding id, display name, path to photo and other details to cursor
                     }
-                }while(contactsCursor.moveToNext());
+                }while(contactsCursor.moveToPrevious());
 
 
             }
@@ -210,8 +257,10 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void unused) {
 
             cr=db.rawQuery("select _id from cont_lists ",null);
+            Toast.makeText(getApplicationContext(),"Successfully Refreshed",Toast.LENGTH_LONG).show();
 
-            Toast.makeText(getApplicationContext(),"Ins "+cr.getCount(),Toast.LENGTH_LONG).show();
+            Intent ints=new Intent(getApplicationContext(),MainPage2.class);
+            startActivity(ints);
 
         }
 
@@ -227,18 +276,7 @@ public class MainActivity extends AppCompatActivity {
         // Database Name
         private static final String DATABASE_NAME = "on_chats";
 
-        // Contacts table name
-        private static final String TABLE_CONTACTS = "contacts";
-        private static final String TABLE_cont_lists = "cont_lists";
-        private static final String TABLE_chats = "chats";
-        private static final String TABLE_way2_dets = "way2_dets";
 
-
-
-        // Contacts Table Columns names
-        private static final String KEY_ID = "id";
-        private static final String KEY_NAME = "name";
-        private static final String KEY_PH_NO = "phone_number";
 
         public Database_funs(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -249,26 +287,71 @@ public class MainActivity extends AppCompatActivity {
         public void onCreate(SQLiteDatabase db) {
 
 
-
-            Log.v("db_funs","crst");
             try{
 
-                String crt_cnct= "CREATE TABLE IF NOT EXISTS contacts  ( user_id   INTEGER PRIMARY KEY AUTOINCREMENT, user_name TEXT, phone TEXT, email_id TEXT, pass_word TEXT  )";
+               // db.execSQL("drop table Messages",null);
+
+                String crt_cnct= "CREATE TABLE IF NOT EXISTS users  ( user_id   INTEGER PRIMARY KEY AUTOINCREMENT, user_name TEXT, phone TEXT, email_id TEXT, pass_word TEXT  )";
                 db.execSQL(crt_cnct);
-                String way2_dets= "CREATE TABLE IF NOT EXISTS way2_dets  (  mob_no TEXT, pass_word TEXT )";
+                String way2_dets= "CREATE TABLE IF NOT EXISTS way2_dets  (  mob_no TEXT, pass_word TEXT ,otp TEXT,user_sts INTEGER)";
                 db.execSQL(way2_dets);
 
-                String cont_lists= "CREATE TABLE IF NOT EXISTS cont_lists  ( _id   INTEGER PRIMARY KEY AUTOINCREMENT, cname TEXT,  mob_nos TEXT, photo TEXT  )";
+                String cont_lists= "CREATE TABLE IF NOT EXISTS cont_lists  ( _id   INTEGER PRIMARY KEY AUTOINCREMENT, cname TEXT,  mob_nos TEXT, photo TEXT ,orig_c_id text )";
                 db.execSQL(cont_lists);
 
-                Log.v("db_funs","fin crt");
+                String msgs= "CREATE TABLE IF NOT EXISTS Messages  ( _id   INTEGER PRIMARY KEY AUTOINCREMENT, sen_der TEXT,  rece_iver TEXT, msg_text TEXT ,ti_me text,msg_sts INTEGER )";
+                db.execSQL(msgs);
+
+
+                Cursor cr=db.rawQuery("select user_id from users",null);
+
+                Intent inm=null;
+                if(cr.getCount()==0){
+
+
+                    Log.v("cr1","1");
+                    inm=new Intent(getApplicationContext(),Registration.class);
+                    startActivity(inm);
+                    Log.v("int","reg");
+                }else{
+                    Cursor cr3=db.rawQuery("select user_sts from way2_dets",null);
+                    if(cr3.getCount()>0){
+
+                        int sts=cr3.getInt(cr.getColumnIndex("user_sts"));
+                        if(sts==2){
+                            Intent inms=new Intent(getApplicationContext(),MainPage2.class);
+                            startActivity(inms);
+                            Log.v("int","m2");
+                        }else{
+                            Intent inms=new Intent(getApplicationContext(),Way2Login.class);
+                            startActivity(inms);
+                            Log.v("int","w21");
+                        }
+
+
+
+                    }else{
+                        Intent inms=new Intent(getApplicationContext(),Way2Login.class);
+                        startActivity(inms);
+
+                        Log.v("int","w2");
+
+                    }
+                }
+
+
+
+
+
+
+
             }catch (Exception e){
-                Log.v("db_funs",e.getMessage());
+                Log.v("c",e.getMessage());
             }
           // Drop older table if existed
 
 
-            new LongOperation().execute();
+            //new LongOperation().execute();
 
 
 

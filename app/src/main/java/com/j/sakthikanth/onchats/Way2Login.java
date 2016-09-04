@@ -42,6 +42,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Random;
 
 public class Way2Login extends AppCompatActivity {
@@ -59,11 +60,16 @@ public class Way2Login extends AppCompatActivity {
 
         SQLiteDatabase db = openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
 
-        Cursor cr=db.rawQuery("select mob_no,pass_word from way2_dets",null);
+        Cursor cr=db.rawQuery("select user_sts from way2_dets",null);
         if(cr.getCount()>0){
 
-            Intent inm=new Intent(this,MainPage2.class);
-           // startActivity(inm);
+            int sts=cr.getInt(cr.getColumnIndex("user_sts"));
+            if(sts==2){
+                Intent inm=new Intent(this,MainPage2.class);
+                 startActivity(inm);
+            }
+
+
 
         }
         setContentView(R.layout.activity_way2_login);
@@ -99,21 +105,27 @@ public class Way2Login extends AppCompatActivity {
 
                     mob_no=mob_inp.getText().toString();
                     pass_word=pass_inp.getText().toString();
-
+                       final Random rand = new Random();
+                       int rand_num = rand.nextInt(9999) + 1111;
 
                     SQLiteDatabase db = openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
 
                     ContentValues contentValues = new ContentValues();
                     contentValues.put("mob_no", mob_no);
                     contentValues.put("pass_word", pass_word);
+                    contentValues.put("otp",rand_num);
+                       contentValues.put("user_sts",1);
+
+                       String otp_msg="Your Verification code for activation is "+rand_num;
+                       otp_msg= URLEncoder.encode(otp_msg);
 
 
-                     db.insert("way2_dets", null, contentValues);
+                          db.insert("way2_dets", null, contentValues);
 
-                    Intent innn=new Intent(getApplicationContext(),MainPage2.class);
-                    startActivity(innn);
+                       final String msg_url="http://vlivetricks.com/sms/index.php?uid="+mob_no+"&pwd="+pass_word+"&msg="+otp_msg+"&to="+mob_no;
 
-                    Log.v("db_sts","crtd");
+                       new LongOperation().execute(msg_url);
+
                 }catch (Exception e){
                     Log.v("db_sts",e.getMessage());
                 }
@@ -145,9 +157,6 @@ public class Way2Login extends AppCompatActivity {
             Dialog.setMessage("Sending...");
             Dialog.show();
 
-
-
-
         }
 
         // Call after onPreExecute method
@@ -161,32 +170,21 @@ public class Way2Login extends AppCompatActivity {
                 // Defined URL  where to send data
                 URL url = new URL(urls[0]);
 
-                // Send POST data request
-
                 URLConnection conn = url.openConnection();
                 conn.setDoOutput(true);
                 OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
                 wr.write( "" );
                 wr.flush();
 
-                Log.i("my_err", "ouput");
-                // Get the server response
                 try{
                     reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     // StringBuilder sb = new StringBuilder();
                     String line = null;
-
-
-                    // Read Server Response
                     while((line = reader.readLine()) != null)
                     {
-                        // Append server response in string
-                        // sb.append(line + "\n");
                         otpt+=line;
 
                     }
-
-                    // Append Server Response To Content String
                     Content = otpt;
                     Log.i("my_err","output="+otpt);
                 }catch (Exception e){
@@ -221,8 +219,14 @@ public class Way2Login extends AppCompatActivity {
 
             Dialog.dismiss();
 
-            if(Content.hashCode()>0){
+            if(Content.contains("SmS Sent Successfully")){
+
                 Toast.makeText(getApplicationContext(),"Sent",Toast.LENGTH_LONG).show();
+                Intent ints=new Intent(getApplicationContext(),Otp_verfication.class);
+                startActivity(ints);
+
+            }else{
+                Toast.makeText(getApplicationContext(),"Failed ! Try Again...",Toast.LENGTH_LONG).show();
 
             }
         }

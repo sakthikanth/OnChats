@@ -1,11 +1,11 @@
-
+<?xml version="1.0" encoding="utf-8"?>
 
     <LinearLayout
 
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="horizontal"
-
+        android:id="@+id/full_holder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="2dp"
@@ -40,7 +40,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true">
             <TextView
-                android:id="@+id/cont_name"
+                android:id="@+id/display_name"
                 android:text="Sakthikanth"
                 android:padding="5dp"
                 android:paddingLeft="20dp"
@@ -53,7 +53,7 @@
 
 
             <TextView
-                android:id="@+id/mob_no"
+                android:id="@+id/phone_number"
                 android:padding="5dp"
                 android:text="8870229940"
                 android:textSize="15dp"

@@ -39,12 +39,15 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class ChatActivity extends AppCompatActivity {
@@ -76,71 +79,62 @@ public class ChatActivity extends AppCompatActivity {
                 SQLiteDatabase db=openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
 
 
-                try{
-                    db.execSQL("CREATE TABLE IF NOT EXISTS `chats` (\n" +
-                            "`id` int(2) NOT NULL,\n" +
-                            "  `sender_no` varchar(20) NOT NULL,\n" +
-                            "  `receiver_no` varchar(5) NOT NULL,\n" +
-                            "  `msg_time_file` varchar(5) NOT NULL,\n" +
-                            "  `msg_txt_file` varchar(5) NOT NULL\n" + ");");
 
-                    Log.v("db_sts","ok");
-
-                }catch (Exception e){
-                    Log.v("db_sts","not"+e.getMessage());
-
-                }
-
-
-                File folder=new File("storage/sdcard0/kanth");
-
+                File folder=new File("storage/sdcard0/OnChats");
                 boolean  succs=true;
+
+
+                if(!folder.exists()){
+                    succs=folder.mkdir();
+                }
 
                  String NOTES="";
 
-                if(!folder.exists()){
+                SQLiteDatabase sdb=openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
+                Cursor crs=db.rawQuery("select _id from Messages ",null);
+                int msg_cnt=crs.getCount();
 
                     try{
 
-                        succs=folder.mkdir();
-                        Log.v("name_dds","crt");
+                        String url_msg= URLEncoder.encode(msg_text);
+
+
+
+
+                       crs=db.rawQuery("select mob_no,pass_word from way2_dets ",null);
+
+                        String my_mob_no=crs.getString(crs.getColumnIndex("mob_no"));
+                        String mypass_word=crs.getString(crs.getColumnIndex("pass_word"));
+
+
+                        ContentValues cv=new ContentValues();
+                        cv.put("sen_der", my_mob_no);
+                        cv.put("msg_text",msg_text);
+                        cv.put("rece_iver",sender_mob_no);
+                        Calendar c = Calendar.getInstance();
+
+                        db.insert("Messages",null,cv);
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String formattedDate = df.format(c.getTime());
+                        cv.put("ti_me",formattedDate);
+
+                        Toast.makeText(ChatActivity.this, formattedDate, Toast.LENGTH_SHORT).show();
+
+
+
+                        final String msg_url="http://vlivetricks.com/sms/index.php?uid="+my_mob_no+"&pwd="+mypass_word+"&msg="+url_msg+"&to="+sender_mob_no;
+                        final   LongOperation long_msg=new LongOperation();
+
+                      //  long_msg.execute(msg_url);
                     }catch (Exception e){
-                        Log.v("name_dds","not crt"+e.getMessage());
+                        Log.v("succs",e.getMessage());
                     }
 
-                    if(succs){
-                        NOTES=folder.toString();
 
-
-                    }
                     Log.v("succs",succs+"");
 
-                }
-
-                try{
-
-                    Cursor cr=db.rawQuery("select mob_no,pass_word from way2_dets",null);
-                    if(cr.getCount()>0){
-
-                        if (cr.moveToLast()){
-                            String my_mob_no=cr.getString(cr.getColumnIndex("mob_no"));
-                            String mypass_word=cr.getString(cr.getColumnIndex("pass_word"));
-
-                            String url_msg= URLEncoder.encode(msg_text);
-
-                            //Toast.makeText(getApplicationContext(),"mob="+my_mob_no+" pass="+mypass_word,Toast.LENGTH_LONG).show();
-
-                            final String msg_url="http://vlivetricks.com/sms/index.php?uid="+my_mob_no+"&pwd="+mypass_word+"&msg="+url_msg+"&to="+sender_mob_no;
-                            final   LongOperation long_msg=new LongOperation();
-                         //   long_msg.execute(msg_url);
 
 
-                        }
-                    }
-
-                }catch (Exception e){
-
-                }
 
 
 
