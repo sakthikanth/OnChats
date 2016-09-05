@@ -286,46 +286,54 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCreate(SQLiteDatabase db) {
 
-
             try{
 
-               // db.execSQL("drop table Messages",null);
 
-                String crt_cnct= "CREATE TABLE IF NOT EXISTS users  ( user_id   INTEGER PRIMARY KEY AUTOINCREMENT, user_name TEXT, phone TEXT, email_id TEXT, pass_word TEXT  )";
+                 String crt_cnct= "CREATE TABLE IF NOT EXISTS users  ( user_id   INTEGER PRIMARY KEY AUTOINCREMENT, user_name TEXT, phone TEXT, email_id TEXT, pass_word TEXT  )";
                 db.execSQL(crt_cnct);
-                String way2_dets= "CREATE TABLE IF NOT EXISTS way2_dets  (  mob_no TEXT, pass_word TEXT ,otp TEXT,user_sts INTEGER)";
+                String way2_dets= "CREATE TABLE IF NOT EXISTS way2_dets  (  _id   INTEGER PRIMARY KEY AUTOINCREMENT,mob_no TEXT, pass_word TEXT ,otp TEXT,user_sts INTEGER)";
                 db.execSQL(way2_dets);
-
+                Log.v("int_ent","1");
                 String cont_lists= "CREATE TABLE IF NOT EXISTS cont_lists  ( _id   INTEGER PRIMARY KEY AUTOINCREMENT, cname TEXT,  mob_nos TEXT, photo TEXT ,orig_c_id text )";
                 db.execSQL(cont_lists);
 
-                String msgs= "CREATE TABLE IF NOT EXISTS Messages  ( _id   INTEGER PRIMARY KEY AUTOINCREMENT, sen_der TEXT,  rece_iver TEXT, msg_text TEXT ,ti_me text,msg_sts INTEGER )";
+                String msgs= "CREATE TABLE IF NOT EXISTS Messages  ( _id   INTEGER PRIMARY KEY AUTOINCREMENT, sen_der TEXT,  rece_iver TEXT, msg_text TEXT ,ti_me TEXT,msg_sts INTEGER )";
                 db.execSQL(msgs);
 
 
-                Cursor cr=db.rawQuery("select user_id from users",null);
+                SQLiteDatabase dbs=openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
 
                 Intent inm=null;
+                Cursor cr=dbs.rawQuery("select user_name from users",null);
+
+                Log.v("int_ent",cr.getCount()+"");
                 if(cr.getCount()==0){
 
 
-                    Log.v("cr1","1");
+                    Log.v("int_ent","4");
                     inm=new Intent(getApplicationContext(),Registration.class);
                     startActivity(inm);
-                    Log.v("int","reg");
+                    Log.v("int_ent","reg");
                 }else{
-                    Cursor cr3=db.rawQuery("select user_sts from way2_dets",null);
-                    if(cr3.getCount()>0){
 
-                        int sts=cr3.getInt(cr.getColumnIndex("user_sts"));
-                        if(sts==2){
-                            Intent inms=new Intent(getApplicationContext(),MainPage2.class);
-                            startActivity(inms);
-                            Log.v("int","m2");
-                        }else{
-                            Intent inms=new Intent(getApplicationContext(),Way2Login.class);
-                            startActivity(inms);
-                            Log.v("int","w21");
+                    Log.v("int_ent","W21");
+                    Cursor cr3=dbs.rawQuery("select user_sts from way2_dets",null);
+                   
+                    if(cr3.getCount()>0){
+                        if(cr3.moveToFirst()){
+
+                             int sts=cr3.getInt(cr3.getColumnIndex("user_sts"));
+
+                            if(sts==2){
+                                Intent inms=new Intent(getApplicationContext(),MainPage2.class);
+                                startActivity(inms);
+                                Log.v("int_ent","m2");
+                            }else{
+                                Intent inms=new Intent(getApplicationContext(),Way2Login.class);
+                                startActivity(inms);
+                                Log.v("int_ent","w21");
+                            }
+
                         }
 
 
@@ -334,7 +342,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent inms=new Intent(getApplicationContext(),Way2Login.class);
                         startActivity(inms);
 
-                        Log.v("int","w2");
+                        Log.v("int_ent","w2");
 
                     }
                 }
@@ -346,12 +354,12 @@ public class MainActivity extends AppCompatActivity {
 
 
             }catch (Exception e){
-                Log.v("c",e.getMessage());
+                Log.v("strt_err",e.getMessage());
             }
           // Drop older table if existed
 
 
-            //new LongOperation().execute();
+            //new LongOperation().execute()
 
 
 

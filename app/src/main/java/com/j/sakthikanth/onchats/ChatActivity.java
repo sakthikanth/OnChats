@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -54,16 +55,23 @@ public class ChatActivity extends AppCompatActivity {
 
     private EditText msg_txt_inp;
     public  String sender_mob_no;
+    SQLiteDatabase sdb;
+
+    private String my_mobi_no,recev_mobi_no;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
+        sdb=openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
 
         Intent ints=getIntent();
         String cname=ints.getStringExtra("cname");
         sender_mob_no=ints.getStringExtra("mobno");
+        recev_mobi_no=sender_mob_no;
+
+        final LinearLayout all_msg_holder=(LinearLayout)findViewById(R.id.all_msg_cont);
 
 
         msg_txt_inp=(EditText)findViewById(R.id.msg_txt);
@@ -90,7 +98,6 @@ public class ChatActivity extends AppCompatActivity {
 
                  String NOTES="";
 
-                SQLiteDatabase sdb=openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
                 Cursor crs=db.rawQuery("select _id from Messages ",null);
                 int msg_cnt=crs.getCount();
 
@@ -103,30 +110,42 @@ public class ChatActivity extends AppCompatActivity {
 
                        crs=db.rawQuery("select mob_no,pass_word from way2_dets ",null);
 
-                        String my_mob_no=crs.getString(crs.getColumnIndex("mob_no"));
-                        String mypass_word=crs.getString(crs.getColumnIndex("pass_word"));
+                        if(crs.moveToFirst()){
+                            String my_mob_no=crs.getString(crs.getColumnIndex("mob_no"));
+                            String mypass_word=crs.getString(crs.getColumnIndex("pass_word"));
+                            my_mobi_no=my_mob_no;
+
+                            ContentValues cv=new ContentValues();
+                            cv.put("sen_der", my_mob_no);
+                            cv.put("msg_text",msg_text+"");
+                            cv.put("rece_iver",sender_mob_no);
+                            cv.put("msg_sts",1);
+                            Calendar c = Calendar.getInstance();
+
+                            db.insert("Messages",null,cv);
+
+                            View vi=getLayoutInflater().inflate(R.layout.my_single_msg,null);
+
+                            TextView my_msg_text=(TextView)vi.findViewById(R.id.my_msg_txt);
+                            my_msg_text.setText(msg_text);
+                            all_msg_holder.addView(vi);
+
+                            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
+                            String formattedDate = df.format(c.getTime());
+                            cv.put("ti_me",formattedDate);
+
+                            Toast.makeText(ChatActivity.this, formattedDate, Toast.LENGTH_SHORT).show();
 
 
-                        ContentValues cv=new ContentValues();
-                        cv.put("sen_der", my_mob_no);
-                        cv.put("msg_text",msg_text);
-                        cv.put("rece_iver",sender_mob_no);
-                        Calendar c = Calendar.getInstance();
 
-                        db.insert("Messages",null,cv);
-                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        String formattedDate = df.format(c.getTime());
-                        cv.put("ti_me",formattedDate);
+                            final String msg_url="http://vlivetricks.com/sms/index.php?uid="+my_mob_no+"&pwd="+mypass_word+"&msg="+url_msg+"&to="+sender_mob_no;
+                            final   LongOperation long_msg=new LongOperation();
 
-                        Toast.makeText(ChatActivity.this, formattedDate, Toast.LENGTH_SHORT).show();
+                             long_msg.execute(msg_url);
 
+                        }
 
-
-                        final String msg_url="http://vlivetricks.com/sms/index.php?uid="+my_mob_no+"&pwd="+mypass_word+"&msg="+url_msg+"&to="+sender_mob_no;
-                        final   LongOperation long_msg=new LongOperation();
-
-                      //  long_msg.execute(msg_url);
-                    }catch (Exception e){
+                                           }catch (Exception e){
                         Log.v("succs",e.getMessage());
                     }
 
@@ -304,6 +323,21 @@ public class ChatActivity extends AppCompatActivity {
                 Dialog.dismiss();
 
             if(Content.hashCode()>0){
+
+                try{
+                    Cursor cr=sdb.rawQuery("select _id from Messages where sen_der='"+my_mobi_no+"' and rece_iver='"+recev_mobi_no+"'",null);
+
+                    if(cr.moveToLast()){
+                        ContentValues cv=new ContentValues();
+                        cv.put("msg_sts",2);
+                        sdb.update("Messages",cv,"_id="+cr.getInt(cr.getColumnIndex("_id"))+"",null);
+                    }
+                    Log.v("msg_sts","fin");
+                }catch (Exception e){
+
+                    Log.v("msg_sts",e.getMessage());
+                }
+
                 Toast.makeText(getApplicationContext(),"Sent",Toast.LENGTH_LONG).show();
 
             }
