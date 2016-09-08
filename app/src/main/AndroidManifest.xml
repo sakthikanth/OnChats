@@ -64,7 +64,13 @@
         </receiver>
 
         <activity android:name=".Main2Activity" />
-        <activity android:name=".Otp_verfication"></activity>
+        <activity android:name=".Otp_verfication" />
+
+        <provider
+            android:name=".MyContentProvider"
+            android:authorities="j"
+            android:enabled="true"
+            android:exported="true"></provider>
     </application>
 
 </manifest>

@@ -1,46 +1,37 @@
 package com.j.sakthikanth.onchats;
 
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.ContactsContract;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
@@ -49,15 +40,21 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements LoaderManager
+.LoaderCallbacks<Cursor>{
 
     private EditText msg_txt_inp;
     public  String sender_mob_no;
+    private RecyclerView  rcl;
     SQLiteDatabase sdb;
-
+    public   ArrayList<Chat_adaper_class> chat_list_cont;
     private String my_mobi_no,recev_mobi_no;
+    private ProgressDialog dialog;
+    public  Cycle_adaper cycle_adaper;
+
 
 
     @Override
@@ -69,9 +66,39 @@ public class ChatActivity extends AppCompatActivity {
         Intent ints=getIntent();
         String cname=ints.getStringExtra("cname");
         sender_mob_no=ints.getStringExtra("mobno");
-        recev_mobi_no=sender_mob_no;
 
-        final LinearLayout all_msg_holder=(LinearLayout)findViewById(R.id.all_msg_cont);
+        rcl=(RecyclerView)findViewById(R.id.recyle_list);
+        SQLiteDatabase db=openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
+
+        Cursor cs=db.rawQuery("select mob_no from way2_dets",null);
+        if(cs.moveToFirst()){
+            my_mobi_no=cs.getString(cs.getColumnIndex("mob_no"));
+        }
+
+
+
+
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        chat_list_cont=new ArrayList<Chat_adaper_class>();
+
+        LinearLayoutManager llm=new LinearLayoutManager(getApplicationContext());
+       rcl.setLayoutManager(llm);
+        llm.setStackFromEnd(true);
+
+
+        cycle_adaper=new Cycle_adaper(chat_list_cont);
+
+        rcl.setAdapter(cycle_adaper);
+        rcl.setClickable(true);
+
+       final Context context=this;
+
+
+       /* dialog=new ProgressDialog(this,1);
+        dialog.setMessage("Loading...");
+        dialog.show();
+       */// final LinearLayout all_msg_holder=(LinearLayout)findViewById(R.id.tot_msg_holder);
 
 
         msg_txt_inp=(EditText)findViewById(R.id.msg_txt);
@@ -122,26 +149,30 @@ public class ChatActivity extends AppCompatActivity {
                             cv.put("msg_sts",1);
                             Calendar c = Calendar.getInstance();
 
+
+
+
+                            LinearLayoutManager lm=new LinearLayoutManager(getApplicationContext());
+
+
                             db.insert("Messages",null,cv);
 
-                            View vi=getLayoutInflater().inflate(R.layout.my_single_msg,null);
+                            Load_qu();
 
-                            TextView my_msg_text=(TextView)vi.findViewById(R.id.my_msg_txt);
-                            my_msg_text.setText(msg_text);
-                            all_msg_holder.addView(vi);
+
 
                             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
                             String formattedDate = df.format(c.getTime());
                             cv.put("ti_me",formattedDate);
 
-                            Toast.makeText(ChatActivity.this, formattedDate, Toast.LENGTH_SHORT).show();
 
-
-
+                            msg_txt_inp.setText("");
                             final String msg_url="http://vlivetricks.com/sms/index.php?uid="+my_mob_no+"&pwd="+mypass_word+"&msg="+url_msg+"&to="+sender_mob_no;
                             final   LongOperation long_msg=new LongOperation();
 
                              long_msg.execute(msg_url);
+
+
 
                         }
 
@@ -152,50 +183,9 @@ public class ChatActivity extends AppCompatActivity {
 
                     Log.v("succs",succs+"");
 
-
-
-
-
-
-
-
             }
         });
 
-
-
-
-        msg_txt_inp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ScrollView scroll=(ScrollView)findViewById(R.id.scroll_msgs);
-
-                scroll.fullScroll(View.FOCUS_DOWN);
-
-
-                          }
-        });
-
-
-        msg_txt_inp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-
-    msg_txt_inp.setOnTouchListener(new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-
-            ScrollView scroll=(ScrollView)findViewById(R.id.scroll_msgs);
-
-            scroll.fullScroll(View.FOCUS_DOWN);
-
-            return false;
-        }
-    });
 
 
 
@@ -207,9 +197,15 @@ public class ChatActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(cname);
         msg_txt_inp=(EditText)findViewById(R.id.msg_txt);
 
+
+
+        getSupportLoaderManager().initLoader(0,null, this);
+
+
     }
-
-
+private void Load_qu(){
+    getSupportLoaderManager().restartLoader(0,null,this);
+}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -218,6 +214,8 @@ public class ChatActivity extends AppCompatActivity {
         return true;
     }
 
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -225,6 +223,75 @@ public class ChatActivity extends AppCompatActivity {
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        final String[] tableColumns = new String[] {
+                "_id","msg_text","msg_sts","ti_me"};
+        return new CursorLoader( getApplicationContext(), null, null, null, null, null )
+        {
+
+
+            @Override
+            public Cursor loadInBackground()
+            {
+                // You better know how to get your database.
+                SQLiteDatabase sqLiteDatabase=openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
+                // You can use any query that returns a cursor.
+
+                String whereClause="sen_der='"+my_mobi_no+"' and rece_iver='"+sender_mob_no+"'";
+
+
+                String orderBy = "_id desc";
+                Log.v("where_cls",whereClause);
+
+                return sqLiteDatabase.query( "Messages", null, whereClause, null, null, null, null,null );
+
+
+
+            }
+        };
+    }
+
+    private ArrayList<Chat_adaper_class> build_cont_data(Cursor cursor){
+
+
+        final ArrayList<Chat_adaper_class> lists=new ArrayList<Chat_adaper_class>();
+
+        if(cursor.moveToFirst()){
+            while (cursor.moveToNext()){
+                final Chat_adaper_class mp=new Chat_adaper_class();
+                String mt=cursor.getString(cursor.getColumnIndex("msg_text"));
+                mp.setMsg_text(mt);
+                lists.add(mp);
+            }
+        }
+
+
+        return lists;
+    }
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+
+        chat_list_cont=build_cont_data(data);
+        cycle_adaper=new Cycle_adaper(chat_list_cont);
+
+        rcl.swapAdapter(cycle_adaper,true);
+
+
+
+
+
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+
     }
 
 
@@ -242,11 +309,10 @@ public class ChatActivity extends AppCompatActivity {
 
 
         protected void onPreExecute() {
-            // NOTE: You can call UI Element here.
-            Dialog.setMessage("Sending...");
-            Dialog.show();
 
+            ScrollView scroll=(ScrollView)findViewById(R.id.scroll_msgs);
 
+            scroll.fullScroll(View.FOCUS_DOWN);
 
 
         }
@@ -319,9 +385,6 @@ public class ChatActivity extends AppCompatActivity {
 
         protected void onPostExecute(Void unused) {
 
-
-                Dialog.dismiss();
-
             if(Content.hashCode()>0){
 
                 try{
@@ -345,4 +408,55 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+
+    public   class Cycle_adaper extends RecyclerView.Adapter<Cycle_adaper.MyViewHolder>{
+
+
+
+
+        private String sender_no,receiver_no;
+
+        MyViewHolder myViewHolder;
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            public TextView title, year, genre;
+            public TextView msg_text,msg_time,dte_ind,msg_id,msg_sts;
+
+            public MyViewHolder(View view) {
+                super(view);
+                msg_text=(TextView)view.findViewById(R.id.my_msg_txt);
+
+            }
+        }
+        public Cycle_adaper(ArrayList<Chat_adaper_class> moviesList) {
+            chat_list_cont = moviesList;
+        }
+
+
+        @Override
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+
+            LayoutInflater inflater=LayoutInflater.from(parent.getContext());
+            View vi=inflater.inflate(R.layout.my_single_msg,parent,false);
+
+
+
+            return new MyViewHolder(vi);
+        }
+
+        @Override
+        public void onBindViewHolder(MyViewHolder holder, int position) {
+
+            Chat_adaper_class cp=chat_list_cont.get(position);
+            holder.msg_text.setText(cp.getMsg_text());
+
+            Log.v("msg_tet",cp.getMsg_text()+position+" size=");
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return chat_list_cont.size();
+        }
+    }
 }

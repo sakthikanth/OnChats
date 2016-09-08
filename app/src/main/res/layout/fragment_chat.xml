@@ -1,63 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
+   
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_chat"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="com.j.sakthikanth.onchats.ChatActivityFragment"
-    tools:showIn="@layout/activity_chat">
-    <ScrollView
-        android:id="@+id/scroll_msgs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/msg_enter_container"
-        android:scrollY="@dimen/activity_vertical_margin"
-        android:fillViewport="true">
+    tools:showIn="@layout/activity_chat"
+    android:gravity="bottom|fill_vertical|end"
+    android:layout_centerInParent="false"
+    android:layout_alignParentBottom="false">
+
+
     <LinearLayout
-        android:id="@+id/full_container"
-        android:orientation="vertical"
+        android:id="@+id/msg_upper_hold"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="bottom"
-        android:paddingBottom="10dp"
-        android:scrollbarAlwaysDrawHorizontalTrack="false"
-        android:scrollbarAlwaysDrawVerticalTrack="false"
+        android:layout_alignParentTop="false"
+        android:layout_above="@+id/msg_enter_container"
+        android:animateLayoutChanges="true"
+        android:gravity="bottom">
 
-        android:scrollbars="vertical"
-        android:layout_alignParentBottom="false"
-        android:layout_above="@+id/msg_enter_container">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyle_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
 
-
-
-
+       <!-- <ScrollView
+            android:id="@+id/scroll_msgs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:nextFocusDown="@drawable/left_arrow"
+            android:nestedScrollingEnabled="true">
             <LinearLayout
-                android:id="@+id/all_msg_cont"
+                android:id="@+id/tot_msg_holder"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="0dp"
-                android:layout_gravity="bottom|end"
-                android:baselineAligned="false"
-                android:clickable="true"
-                android:contextClickable="true"
-                android:gravity="bottom">
+                android:paddingBottom="10dp"
+                android:layout_height="match_parent">
 
-
-
-
-
-
-
+                <include layout="@layout/my_single_msg" />
 
             </LinearLayout>
+        </ScrollView>-->
+
+
 
 
 
     </LinearLayout>
-    </ScrollView>
+
 
     <LinearLayout
         android:orientation="horizontal"
@@ -65,8 +59,8 @@
         android:layout_height="wrap_content"
         android:weightSum="1"
         android:id="@+id/msg_enter_container"
-        android:background="@color/colorPrimaryDark"
-        android:gravity="bottom|end"
+        android:background="?attr/colorControlHighlight"
+        android:gravity="end"
         android:layout_alignParentBottom="true">
 
         <LinearLayout
@@ -74,39 +68,38 @@
             android:layout_height="match_parent"
             android:paddingBottom="22dp"
             android:layout_weight="1.07"
-            android:weightSum="1"
+            android:weightSum="2"
             android:paddingLeft="15dp"
-            android:orientation="vertical">
-
+            android:paddingTop="16dp">
             <TextView
-                android:layout_width="match_parent"
                 android:text="146"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                android:textAlignment="center"
-                android:padding="5dp"
-                android:textColor="@android:color/background_light" />
-
+                android:padding="3dp" />
             <EditText
                 android:id="@+id/msg_txt"
                 android:hint="Enter Message"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
 
 
                 android:elegantTextHeight="false"
-                android:background="@android:color/background_light"
-                android:maxHeight="100dp"
-                android:maxLines="146"
+                android:layout_gravity="bottom"
                 android:padding="10dp"
-                android:paddingLeft="10dp"
-                android:gravity="top" />
+                android:background="@android:color/background_light"
+                android:foregroundGravity="top|center"
+                android:maxLength="146"
+                android:maxHeight="100dp"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollIndicators="right"
+                style="@style/Widget.AppCompat.EditText" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center_vertical">
+            android:gravity="bottom|end">
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"
@@ -114,19 +107,20 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_vertical|end"
                 android:layout_margin="@dimen/fab_margin"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="33dp"
                 android:background="@android:drawable/ic_menu_send"
                 app:elevation="6dp"
-                app:backgroundTintMode="multiply"
+                app:backgroundTintMode="src_in"
                 android:src="@android:drawable/ic_menu_send"
                 app:srcCompat="@android:drawable/ic_menu_send"
                 android:scaleType="center"
-                app:backgroundTint="@android:color/holo_blue_dark"
+                app:backgroundTint="@android:color/holo_green_dark"
                 />
+
+
         </LinearLayout>
 
 
     </LinearLayout>
-
 
 </RelativeLayout>

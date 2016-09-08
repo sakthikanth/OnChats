@@ -199,6 +199,7 @@ public class Contact_fragment extends ListFragment implements LoaderManager.Load
                 SQLiteDatabase sqLiteDatabase=getActivity().openOrCreateDatabase("on_chats",Context.MODE_PRIVATE,null);
                 // You can use any query that returns a cursor.
 
+
                 String whereClause=null;
 
                 String[] whereArgs =null;
@@ -241,6 +242,9 @@ public class Contact_fragment extends ListFragment implements LoaderManager.Load
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+
+
+        Toast.makeText(getActivity(), "n,",Toast.LENGTH_LONG).show();
 
 
         cursorAdapter.swapCursor(null);
@@ -343,15 +347,14 @@ public class Contact_fragment extends ListFragment implements LoaderManager.Load
         TextView phoneNumber;
         View separator;
         TextView fst_ltr_img;
+
+        ImageView imageView;
+
         LinearLayout full_holders;
 
     }
 
 
-    public void cra_lod(){
-        getLoaderManager().restartLoader(0, null, this);
-
-    }
 
     public  class Database_funs extends SQLiteOpenHelper {
 
@@ -382,6 +385,7 @@ public class Contact_fragment extends ListFragment implements LoaderManager.Load
         // Creating Tables
         @Override
         public void onCreate(SQLiteDatabase db) {
+
 
         }
 
