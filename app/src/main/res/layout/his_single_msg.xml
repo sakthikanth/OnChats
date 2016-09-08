@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/single_msg_cont"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:elevation="10dp"
+        android:paddingTop="30dp">
+
+
+        <LinearLayout
+            android:id="@+id/msg_txt_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:paddingLeft="20dp"
+            android:background="@drawable/left_arrow"
+            android:paddingRight="30dp"
+            android:gravity="center_horizontal|clip_horizontal"
+            android:layout_marginLeft="10dp">
+            <TextView
+                android:id="@+id/recv_msg_txt"
+                android:text="Most of the preceding properties are also available from the new android:inputType
+attribute, added in Android 1.5 as part of adding “soft keyboards” to Android (discussed
+in Chapter 11)."
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:textColor="?attr/editTextColor"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:paddingRight="10dp"
+                android:maxWidth="250dp"
+                android:lineSpacingExtra="3dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

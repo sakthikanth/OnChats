@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_chat"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.j.sakthikanth.onchats.ChatActivityFragment"
+   >
+    <ScrollView
+        android:id="@+id/scroll_msgs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/msg_enter_container"
+        android:scrollY="@dimen/activity_vertical_margin"
+        android:fillViewport="true">
+        <LinearLayout
+            android:id="@+id/full_container"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:paddingBottom="10dp"
+            android:scrollbarAlwaysDrawHorizontalTrack="false"
+            android:scrollbarAlwaysDrawVerticalTrack="false"
+
+            android:scrollbars="vertical"
+            android:layout_alignParentBottom="false"
+            android:layout_above="@+id/msg_enter_container">
+
+
+
+
+            <LinearLayout
+                android:id="@+id/all_msg_cont"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="0dp"
+                android:layout_gravity="bottom|end"
+                android:baselineAligned="false"
+                android:clickable="true"
+                android:contextClickable="true"
+                android:gravity="bottom">
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="1"
+        android:id="@+id/msg_enter_container"
+        android:background="@color/colorPrimaryDark"
+        android:gravity="bottom|end"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingBottom="22dp"
+            android:layout_weight="1.07"
+            android:weightSum="1"
+            android:paddingLeft="15dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:text="146"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textAlignment="center"
+                android:padding="5dp"
+                android:textColor="@android:color/background_light" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_vertical|end"
+                android:layout_margin="@dimen/fab_margin"
+                android:layout_marginTop="0dp"
+                android:background="@android:drawable/ic_menu_send"
+
+                app:backgroundTintMode="multiply"
+                android:src="@android:drawable/ic_menu_send"
+                app:srcCompat="@android:drawable/ic_menu_send"
+
+                app:backgroundTint="@android:color/holo_blue_dark"
+                />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>
