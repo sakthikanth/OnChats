@@ -12,45 +12,11 @@
     android:layout_centerInParent="false"
     android:layout_alignParentBottom="false">
 
-
-    <LinearLayout
-        android:id="@+id/msg_upper_hold"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyle_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="false"
-        android:layout_above="@+id/msg_enter_container"
-        android:animateLayoutChanges="true"
-        android:gravity="bottom">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyle_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
-
-       <!-- <ScrollView
-            android:id="@+id/scroll_msgs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:nextFocusDown="@drawable/left_arrow"
-            android:nestedScrollingEnabled="true">
-            <LinearLayout
-                android:id="@+id/tot_msg_holder"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:paddingBottom="10dp"
-                android:layout_height="match_parent">
-
-                <include layout="@layout/my_single_msg" />
-
-            </LinearLayout>
-        </ScrollView>-->
-
-
-
-
-
-    </LinearLayout>
+        android:layout_above="@+id/msg_enter_container"></android.support.v7.widget.RecyclerView>
 
 
     <LinearLayout
@@ -72,6 +38,7 @@
             android:paddingLeft="15dp"
             android:paddingTop="16dp">
             <TextView
+                android:id="@+id/msg_text_length"
                 android:text="146"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
