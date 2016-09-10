@@ -1,82 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:paddingLeft="10dp"
 android:orientation="vertical"
     android:padding="2dp"
-    android:layout_height="wrap_content"
-   >
+    android:layout_height="wrap_content">
 
+    <LinearLayout
+        android:id="@+id/date_seperator"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/date_indctr"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
 
+            android:gravity="center_horizontal"
+            android:weightSum="1"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aug 26"
+                android:textAlignment="center"
+                android:textSize="14sp"
+                android:background="@drawable/round"
+                android:gravity="center_horizontal|center"
+                android:padding="2dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="30dp"
+                android:layout_weight="0.17" />
+        </LinearLayout>
+    </LinearLayout>
     <LinearLayout
 
         android:id="@+id/my_msg_holder"
         android:layout_width="match_parent"
         android:gravity="right"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="invisible"
         >
+
+
+
         <LinearLayout
+            android:orientation="vertical"
             android:id="@+id/my_msg_txt_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:paddingRight="10dp"
+            android:paddingRight="6dp"
             android:background="@drawable/right_arrow"
             android:layout_marginLeft="10dp"
 
             >
+
             <TextView
                 android:id="@+id/my_msg_txt"
-                android:text="Another flavor of field is one
-AutoCompleteTextView widget, discussed in greater detail in Chapter 12."
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
-                android:textColor="#ffffff"
-                android:textSize="16sp"
-                android:textAllCaps="false"
-                android:paddingRight="5dp"
                 android:maxWidth="250dp"
-                android:lineSpacingExtra="3dp" />
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="10dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="131dp"
+                android:layout_height="17dp"
+                android:textAlignment="center"
+                android:layout_marginLeft="10dp">
+                <TextView
+                    android:id="@+id/my_msg_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:paddingLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:textSize="11dp"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
+                    />
+
+                <ImageView
+                    android:id="@+id/msg_not_seen"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+
+                    app:srcCompat="@android:drawable/ic_menu_recent_history"
+                    android:textAlignment="center"
+                    android:layout_width="20dp"
+                    android:layout_marginLeft="10dp" />
+                <ImageView
+                    android:id="@+id/msg_seen"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_single_tick"
+                    android:textAlignment="center"
+                    android:layout_width="25dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginLeft="10dp" />
+            </LinearLayout>
 
         </LinearLayout>
 
     </LinearLayout>
+
     <LinearLayout
+
         android:id="@+id/his_msg_holder"
         android:layout_width="match_parent"
         android:gravity="left"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="invisible"
         >
         <LinearLayout
+            android:orientation="vertical"
             android:id="@+id/his_msg_txt_layout"
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
-            android:padding="5dp"
-
-            android:paddingRight="10dp"
+            android:paddingRight="6dp"
             android:background="@drawable/left_arrow"
-            android:layout_marginLeft="10dp">
+            android:layout_marginLeft="10dp"
+
+            >
             <TextView
                 android:id="@+id/his_msg_txt"
-                android:text="Another flavor of field is one
-AutoCompleteTextView widget, discussed in greater detail in Chapter 12."
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
-                android:textSize="16sp"
-                android:textAllCaps="false"
-                android:paddingRight="5dp"
                 android:maxWidth="250dp"
-                android:lineSpacingExtra="3dp" />
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="10dp" />
 
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="131dp"
+                android:layout_height="17dp"
+                android:textAlignment="center"
+                android:layout_marginLeft="10dp">
+                <TextView
+                    android:id="@+id/his_msg_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:paddingLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:textSize="11dp"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
+                    />
+
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
-
 
 </RelativeLayout>
 

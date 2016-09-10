@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -65,6 +66,7 @@ public class ChatActivity extends AppCompatActivity implements LoaderManager
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         sdb=openOrCreateDatabase("on_chats",MODE_PRIVATE,null);
+        msg_txt_inp=(EditText)findViewById(R.id.msg_txt);
 
         Intent ints=getIntent();
         String cname=ints.getStringExtra("cname");
@@ -96,7 +98,6 @@ public class ChatActivity extends AppCompatActivity implements LoaderManager
         rcl.setClickable(true);
 
 
-        msg_txt_inp=(EditText)findViewById(R.id.msg_txt);
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -148,7 +149,6 @@ public class ChatActivity extends AppCompatActivity implements LoaderManager
                             LinearLayoutManager lm=new LinearLayoutManager(getApplicationContext());
 
 
-                            db.insert("Messages",null,cv);
 
 
                             Load_qu();
@@ -156,6 +156,9 @@ public class ChatActivity extends AppCompatActivity implements LoaderManager
                             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
                             String formattedDate = df.format(c.getTime());
                             cv.put("ti_me",formattedDate);
+
+                            db.insert("Messages",null,cv);
+
 
 
                             msg_txt_inp.setText("");
@@ -176,27 +179,30 @@ public class ChatActivity extends AppCompatActivity implements LoaderManager
         });
 
 
+
         msg_txt_inp.addTextChangedListener(new TextWatcher() {
 
+
+            TextView tv1=(TextView)findViewById(R.id.msg_text_length);
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                Toast.makeText(ChatActivity.this, "bef", Toast.LENGTH_SHORT).show();
 
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                TextView tv=(TextView)findViewById(R.id.msg_text_length);
+                int len=msg_txt_inp.getText().length();
+                try{
+                    tv1.setText(146-len+"");
 
-                
-                tv.setText(146-(msg_txt_inp.getText().length()));
-                Toast.makeText(ChatActivity.this, "on", Toast.LENGTH_SHORT).show();
+                }catch(Exception e){
+                    Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
-                Toast.makeText(ChatActivity.this, "aft", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -211,7 +217,6 @@ public class ChatActivity extends AppCompatActivity implements LoaderManager
 
 
         getSupportActionBar().setTitle(cname);
-        msg_txt_inp=(EditText)findViewById(R.id.msg_txt);
 
 
 
@@ -281,8 +286,13 @@ private void Load_qu(){
                 final Chat_adaper_class mp=new Chat_adaper_class();
                 String mt=cursor.getString(cursor.getColumnIndex("msg_text"));
                 String sn=cursor.getString(cursor.getColumnIndex("sen_der"));
+                String msg_time=cursor.getString(cursor.getColumnIndex("ti_me"));
+                int msg_sts=cursor.getInt(cursor.getColumnIndex("msg_sts"));
+
                 mp.setMsg_text(mt);
                 mp.setSender_no(sn);
+                mp.setMsg_time(msg_time);
+                mp.setMsg_sts(msg_sts);
                 lists.add(mp);
             }
         }
@@ -330,6 +340,7 @@ private void Load_qu(){
             ScrollView scroll=(ScrollView)findViewById(R.id.scroll_msgs);
 
             scroll.fullScroll(View.FOCUS_DOWN);
+
 
 
         }
@@ -437,7 +448,8 @@ private void Load_qu(){
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView title, year, genre;
             public LinearLayout my_msg_layout,his_msg_layout;
-            public TextView my_msg_text,msg_time,dte_ind,msg_id,msg_sts,his_msg_text;
+            public TextView my_msg_text,my_msg_time,his_msg_time,dte_ind,msg_id,his_msg_text;
+            public ImageView msg_seen,msg_not_seens;
 
             public MyViewHolder(View view) {
                 super(view);
@@ -445,6 +457,11 @@ private void Load_qu(){
                 his_msg_text=(TextView)view.findViewById(R.id.his_msg_txt);
                 his_msg_layout=(LinearLayout)view.findViewById(R.id.his_msg_holder);
                 my_msg_layout=(LinearLayout)view.findViewById(R.id.my_msg_holder);
+                my_msg_time=(TextView)view.findViewById(R.id.my_msg_time);
+                his_msg_time=(TextView)view.findViewById(R.id.his_msg_time);
+                msg_seen=(ImageView)view.findViewById(R.id.msg_seen);
+                msg_not_seens=(ImageView)view.findViewById(R.id.msg_not_seen);
+
 
             }
         }
@@ -474,22 +491,54 @@ private void Load_qu(){
             Chat_adaper_class cp=chat_list_cont.get(position);
 
             String sender_no=cp.getSender_no();
+            String msg_time=cp.getMsg_time();
 
-            if(sender_no.equals(my_mobi_no)){
 
-                holder.my_msg_layout.setVisibility(View.VISIBLE);
-                holder.my_msg_text.setText(cp.getMsg_text());
+            if(cp.getMsg_time()!=null){
+                msg_time=msg_time.substring(11);
+            }
 
-            }else{
 
-                holder.his_msg_layout.setVisibility(View.VISIBLE);
-                holder.his_msg_text.setText(cp.getMsg_text());
+
+            int  msg_sts=cp.getMsg_sts();
+            String fh="";
+
+
+
+            try{
+                int img_src=getResources().getIdentifier(fh, null, getPackageName());
+
+                if(sender_no.equals(my_mobi_no)){
+
+                    holder.my_msg_layout.setVisibility(View.VISIBLE);
+                    holder.my_msg_text.setText(cp.getMsg_text());
+                    holder.my_msg_time.setText(msg_time);
+                    if(msg_sts==1){
+                        holder.msg_not_seens.setVisibility(View.VISIBLE);
+
+                    }else{
+                        holder.msg_seen.setVisibility(View.VISIBLE);
+
+
+                    }
+
+
+                }else{
+
+                    holder.his_msg_layout.setVisibility(View.VISIBLE);
+                    holder.his_msg_text.setText(cp.getMsg_text());
+                    holder.his_msg_time.setText(msg_time);
+
+
+                }
+
+            }catch (Exception e){
+                Log.v("msg_err",e.getMessage());
 
             }
 
 
 
-            Log.v("msg_tet",cp.getMsg_text()+position+" sizes="+chat_list_cont.size());
 
         }
 

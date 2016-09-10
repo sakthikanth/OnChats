@@ -8,9 +8,9 @@ import android.view.View;
  */
 
 public class Chat_adaper_class  {
-    private String msg_text,msg_time,sender_no,receiver_no,dte_ind,msg_id,msg_sts;
+    private String msg_text,msg_time,sender_no,receiver_no,dte_ind,msg_id;
 
-
+private  int msg_sts;
 
     public String getDte_ind() {
         return dte_ind;
@@ -20,7 +20,7 @@ public class Chat_adaper_class  {
         return msg_id;
     }
 
-    public String getMsg_sts() {
+    public int getMsg_sts() {
         return msg_sts;
     }
 
@@ -48,7 +48,7 @@ public class Chat_adaper_class  {
         this.dte_ind = dte_ind;
     }
 
-    public void setMsg_sts(String msg_sts) {
+    public void setMsg_sts(int  msg_sts) {
         this.msg_sts = msg_sts;
     }
 

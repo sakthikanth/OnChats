@@ -70,7 +70,12 @@
             android:name=".MyContentProvider"
             android:authorities="j"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true" />
+
+        <activity
+            android:name=".Main3Activity5"
+            android:label="@string/title_activity_main35"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

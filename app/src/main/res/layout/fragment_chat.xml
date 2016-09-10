@@ -60,7 +60,10 @@
                 android:maxHeight="100dp"
                 android:scrollbarStyle="outsideOverlay"
                 android:scrollIndicators="right"
-                style="@style/Widget.AppCompat.EditText" />
+                style="@style/Widget.AppCompat.EditText"
+                android:capitalize="sentences"
+                android:lineSpacingExtra="8sp"
+                android:scrollbars="vertical" />
         </LinearLayout>
 
         <LinearLayout
